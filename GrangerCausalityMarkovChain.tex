@@ -24,6 +24,8 @@
 \usepackage{bm}
 \usepackage{booktabs}
 \usepackage[round]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{chains}
 \usepackage{lipsum}
 \usepackage{amsmath}
 \usepackage{caption}
@@ -38,14 +40,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{subfigure}
 \usepackage{xargs}
-\usepackage[pdftex,dvipsnames]{xcolor}
-\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 
-\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
-\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
-\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
-\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
-\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
 
 \setcounter{MaxMatrixCols}{10}
 %TCIDATA{OutputFilter=LATEX.DLL}
@@ -139,8 +134,81 @@ $\left. {}\right. $
 \section{Introduction \label{Introduction}}
 
 \section{Motivation \label{Motivation}}
+Consider the simple case of a two-state Markov chain, such as the one depicted below
 
+\begin{center}
+\begin{tikzpicture}[
+mynode/.style={
+  draw,
+  minimum size=2em
+  },
+every loop/.append style={-latex},  
+start chain=going right  
+]
+\foreach \Value in {1,2}
+  \node[mynode,on chain] (s\Value) {$S_{\Value}$};
+\path[-latex]
+(s1) edge[bend right] node[auto,swap,font=\small] {$r_{12}$} (s2)
+(s2) edge[bend right] node[auto,swap,font=\small] {$r_{21}$} (s1)
+(s1) edge[loop left] node[left,font=\small] {$1-r_{12}$} (s1)
+(s2) edge[loop right] node[right,font=\small] {$1-r_{21}$} (s2);
+\end{tikzpicture}
+\end{center}
+where
+\begin{equation}\label{eq: transition prob}
+r_{ij}=P[X_t=i \mid X_{t-1}=j],\quad i,j\in\{1,2\}
+\end{equation}
+To estimate the conditional probabilties $r_{ij}$, we may express (\ref{eq: transition prob}) as follows
+\begin{equation}
+r_{ij}=\frac{P[X_t=i, X_{t-1}=j]}{P[X_{t-1}=j]}
+\end{equation}
+We know from the Theorem of \citet{sklar1959fonctions} that for the continuous variables $\{(X,Y,Z)\in\R\times\R\times\R\equiv \R^3\}$, the joint distribution function $F_{XYZ}(x,y,z)$ can be expressed using the marginal distributions and a copula function capturing the depedence, - i.e. 
+\begin{equation}\label{eq: copula}
+F(x,y,z)=C(F_X(x),F_Y(y),F_Z(z))
+\end{equation}
+where $F_{\kappa}(.)$ for $\kappa=X, Y, Z$ is the marginal distribution function of variable $\kappa$ and $C(F_X(.),F_Y(.),F_Z(.))$ is a copula function on $[0.1]^3$ that captures the dependence of $(X,Y,Z)$. If we take the derivative of $\ref{eq: copula}$ with respect to $(x,y,z)$, we obtain the joint density funciton of $(X,Y,Z)$:
+\begin{equation}\label{eq: density}
+f(x,y,z)=f_X(x)\times f_Y(y)\times f_Z(z)\times c(F_X(x),F_Y(y),F_Z(z))
+\end{equation}
 \section{Copula-based Granger causality measures for qualitative processes \label{Copula-based Granger causality measures for qualitative processes}}
+
+Consider a homogeneous Markov process of order one with a state-space consisting of finite elements and the transition matrix
+\begin{equation}\label{eq: transition matrix}
+P[X_t=i,Y_t=k\mid X_{t-1}=j,Y_{t-1}=l]=p_{i,k\mid j,l},
+\end{equation}
+for $i,j=1,\cdots,J$ and $k,l=1,\cdots,L$. Furthermore, the invariant initial probability is given by
+\begin{equation}
+P[X_t=i,Y_t=k]=\pi_{i,k}
+\end{equation}
+with $i=1,\cdots,J$ and $k=1,\cdots,L$. \citet{gourieroux1987kullback} show that the causality measure from $X$ to $Y$ is defined by
+\begin{equation}\label{eq: 1989measure}
+C(X\rightarrow Y)=\sum\limits_{j=1}^{J}\sum\limits_{l=1}^{L}\pi_{j,l}\left\{\sum\limits_{k=1}^{L}p_{k\mid j,l}\log\frac{p_{k\mid j,l}}{p^y_{k\mid l}}\right\}
+\end{equation}
+where
+\[
+p_{k\mid j,l}=\sum_{i=1}^{J}p_{i,j\mid k,l}=P[X_t=i\mid X_{t-1}=j,Y_{t-1}=l]\quad\text{and}\quad p^{y}_{k\mid l}=\frac{\sum\limits_{k=1}^L\sum\limits_{l=1}^Lp_{i,k\mid j,l}\pi_{j,l}}{\sum\limits_{l=1}^L\pi_{j,l}}
+\]
+However, expression (\ref{eq: 1989measure}) is difficult to evaluate. 
+
+\[
+P[X_t=i,Y_t=k\mid X_{t-1}=j,Y_{t-1}=l]=p_{i,k\mid j,l}
+\]
+\[
+f[x_t^*,y_t^*\mid x_{t-1}^*,y_{t-1}^*]=p_{i,k\mid j,l}
+\]
+with
+\[
+X_t^*=X_t+U-1,\quad U\sim Uniform[0,1]
+\]
+\begin{eqnarray*}
+f[x_t^*,y_t^*, x_{t-1}^*,y_{t-1}^*]/f(x_{t-1}^*,y_{t-1}^*)=\\
+f(x_t^*)f(y_t^*)f(x_{t-1}^*)f(y_{t-1}^*)c(F(x_t^*),F(y_t^*),F(x_{t-1}^*),F(y_{t-1}^*))/f(x_{t-1}^*)f(y_{t-1}^*)c(F(x_{t-1}^*),F(y_{t-1}^*)
+\end{eqnarray*}
+
+\begin{eqnarray*}
+f[y_t^*, x_{t-1}^*,y_{t-1}^*]=f(y_t^*)f(x_{t-1}^*)f(y_{t-1}^*)c(F(y_t^*),F(1),F(y_{t-1}^*),F(x_{t-1}))
+\end{eqnarray*}
+
 
 \section{Estimation and inference \label{Estimation and inference}}
 
@@ -166,7 +234,7 @@ $\left. {}\right. $
 
 \newpage
 \bibliographystyle{apa}
-% \bibliography{References_Final}
+\bibliography{References_Final}
 
 \newpage
 
