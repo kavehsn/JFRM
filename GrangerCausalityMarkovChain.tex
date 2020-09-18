@@ -88,7 +88,7 @@
 %\input{tcilatex}
 \begin{document}
 
-\title{{Non-parametric estimation and inference for conditional mass based Granger causality measures for high-dimensional Markov chains}}
+\title{{Non-parametric estimation and inference for conditional mass based Granger causality measures for high-dimensional Markov chains with unknown transition matrices}}
 \author{Xiaoxiao Ma\thanks{%
 Institute for Transport Studies (ITS), University of Leeds. Address and email:
 Institute for Transport Studies (ITS), University of Leeds, 34-40 University Road, Leeds, LS2 9JT}\\
@@ -107,7 +107,7 @@ Durham University}
 \setlength{\baselineskip}{18pt}\pagestyle{plain}\newpage
 
 \begin{center}
-$\left. {}\right. ${\LARGE Non-parametric estimation and inference for conditional mass based Granger causality measures for high-dimensional Markov chains}%
+$\left. {}\right. ${\LARGE Non-parametric estimation and inference for conditional mass based Granger causality measures for high-dimensional Markov chains with unknown transition matrices}%
 \begin{equation*}
 \end{equation*}
 
@@ -134,7 +134,7 @@ $\left. {}\right. $
 \section{Introduction \label{Introduction}}
 
 \section{Motivation \label{Motivation}}
-Consider the simple case of a two-state Markov chain, such as the one depicted below
+Consider the simple case of a first-order stationary two-state Markov chain, such as the one depicted below
 
 \begin{center}
 \begin{tikzpicture}[
@@ -154,6 +154,14 @@ start chain=going right
 (s2) edge[loop right] node[right,font=\small] {$1-r_{21}$} (s2);
 \end{tikzpicture}
 \end{center}
+with an \textit{unknown} transition matrix 
+\[
+\mathbf{P}=
+\begin{bmatrix}
+1-r_{12}&r_{12}\\
+r_{21}&1-r_{21}
+\end{bmatrix}
+\]
 where
 \begin{equation}\label{eq: transition prob}
 r_{ij}=P[X_t=i \mid X_{t-1}=j],\quad i,j\in\{1,2\}
@@ -162,7 +170,7 @@ To estimate the conditional probabilties $r_{ij}$, we may express (\ref{eq: tran
 \begin{equation}
 r_{ij}=\frac{P[X_t=i, X_{t-1}=j]}{P[X_{t-1}=j]}
 \end{equation}
-We know from the Theorem of \citet{sklar1959fonctions} that for the continuous variables $\{(X,Y,Z)\in\R\times\R\times\R\equiv \R^3\}$, the joint distribution function $F_{XYZ}(x,y,z)$ can be expressed using the marginal distributions and a copula function capturing the depedence, - i.e. 
+Furthermore, we know from the Theorem of \citet{sklar1959fonctions} that for the continuous variables $\{(X,Y,Z)\in\R\times\R\times\R\equiv \R^3\}$, the joint distribution function $F_{XYZ}(x,y,z)$ can be expressed using the marginal distributions and a copula function capturing the depedence, - i.e. 
 \begin{equation}\label{eq: copula}
 F(x,y,z)=C(F_X(x),F_Y(y),F_Z(z))
 \end{equation}
